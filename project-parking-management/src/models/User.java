@@ -8,8 +8,7 @@ public class User {
     private String role; // Role (manager, employee)
 
     // Empty constructor
-    public User() {
-    }
+    public User() {}
 
     // Constructor with all fields
     public User(int id, String username, String email, String password, String role) {
@@ -19,6 +18,7 @@ public class User {
         this.password = password;
         this.role = role;
     }
+
 
     // Constructor with all fields
     public int getId() {
