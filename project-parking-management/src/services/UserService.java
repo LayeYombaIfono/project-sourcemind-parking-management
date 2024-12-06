@@ -90,9 +90,9 @@ public class UserService {
 
         }catch (SQLException e){
             System.out.println("Erreur lors de la récupération de l'utilisateur : " + e.getMessage());
-            //e.printStackTrace();
+            e.printStackTrace();
         }
-        return null; // Retourne null si l'utilisateur n'est pas trouve
+       return user;
     }
 
     // Mettre à jour un utilisateur (Update)

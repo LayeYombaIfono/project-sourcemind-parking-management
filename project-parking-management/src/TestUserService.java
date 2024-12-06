@@ -6,9 +6,12 @@ import java.util.List;
 public class TestUserService {
     public static void main(String[] args) {
 
-        UserService userService  = new UserService();
-       User user1 = new User( "IFONO", "ifono@gmail.com", "password1234", "user");
-       User user2 = new User( "jean IFONO", "jean12@gmail.com", "password1234jean", "user");
+       UserService userService  = new UserService();
+
+    //Ajouter un utilisateur
+      /*
+        User user1 = new User( "IFONO", "ifono@gmail.com", "password1234", "user");
+        User user2 = new User( "jean IFONO", "jean12@gmail.com", "password1234jean", "user");
 
        boolean isResgitered = userService.registerUser(user1);
        boolean isResgistered2 = userService.registerUser(user2);
@@ -20,36 +23,36 @@ public class TestUserService {
        }else {
            System.out.println("Echec");
        }
-
-
-
-        //boolean userAdded2 = userService.addUser("Ifono", "ifono12@gmail.com", "1991", "Admin");
-        //System.out.println("L'utilisateur ajoute avec succes !" + userAdded);
-
-        // Authentifier un utilisateur
-        //boolean authenticated = userService.authenticate("ifono12@gmail.com", "1991");
-
-        //System.out.println("Authentification reussie : " + authenticated);
-
-        // Tester un mot de passe incorrect
-        //boolean failedAuth = userService.authenticate("johndoe@gmail.com", "14578962@ghgjg");
-        //System.out.println("Authentification echoue : " + failedAuth);
-
-        // Recuperer tous les utilisateurs
-//        List<User> users = userService.getAllUser();
-//        System.out.println("liste des utilisateurs");
-//        for (User user : users){
-//            System.out.println("Nom : " + user.getUsername()  + "\nEmail : " + user.getEmail());
-//        }
+       */
 
         //Recuperer un utilisateur
-//        User user = userService.getUserById(1);
-//        if (user != null){
-//            System.out.println("Utilisateur trouver : " + user.getUsername());
-//        }
 
-        // Supprimer un utilisateur
-//        boolean userDeleted = userService.deleteUser(1);
-//        System.out.println("Utilisateur supprime : " + userDeleted);
+    /*int userId = 1;
+    User userById = userService.getUserById(userId);
+
+    if (userById != null){
+        System.out.println("Utilisateur trouver avec ID : " + "\nId: " +
+                userById.getId() + "\nNom: " + userById.getUsername() + "\nEmail: "
+                + userById.getEmail() + "\nRole: " + userById.getRole());
+    }else {
+        System.out.println("Aucun utilisateur trouvé avec l'ID " + userId);
+    }*/
+
+    //Recuperer tous les utilisateurs
+        List<User> users = userService.getAllUsers();
+
+        //Afficher les utilisateurs
+        if (!users.isEmpty()){
+            System.out.println("Liste des utilisateurs: ");
+
+            for (User user : users){
+                System.out.println("Nom: " + user.getUsername() + "\nEmail: " + user.getEmail()
+                + "\nRole: " + user.getRole());
+                System.out.println("<-------------------->");
+            }
+        }else {
+            System.out.println("Aucun utilisateur trouvé");
+        }
+
     }
 }
