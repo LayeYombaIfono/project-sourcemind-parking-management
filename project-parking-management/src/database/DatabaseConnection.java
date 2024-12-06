@@ -1,29 +1,26 @@
 package database;
 
-import com.mysql.cj.jdbc.Driver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final   String URL = "jdbc:mysql://localhost/parking_management";
-    private static final String USER = "root";
-    private static final  String PASSWORD = "";
 
-    public static Connection connect() throws SQLException{
-      Driver dv = new com.mysql.cj.jdbc.Driver();
-      DriverManager.registerDriver(dv);
-      return DriverManager.getConnection(URL, USER, PASSWORD);
-  }
 
-   /* public static void main(String[] args) {
+    public static Connection getConnection() throws SQLException{
+           String URL = "jdbc:mysql://localhost:3306/parking_management_sourcemind";
+           String USER = "root";
+           String PASSWORD = "";
+
         try {
-            System.out.println("Connexion a reussie ! " + connect());
+            return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
+            System.out.println("Erreur lors de la connexion à la base de données : " + e.getMessage());
             throw new RuntimeException(e);
         }
-    }*/
+  }
+
 
 
 }

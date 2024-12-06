@@ -11,46 +11,51 @@ import java.util.List;
 public class UserService {
 
     // Ajouter un nouvel utilisateur (create)
-    public boolean addUser(String username, String email, String password, String role){
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt()); //Hachage du mot de passe
+    public boolean registerUser(User user){
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()); //Hachage du mot de passe
         String query = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
 
-        try(Connection connection = DatabaseConnection.connect();
+        try(Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1, username);
-            stmt.setString(2, email);
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getEmail());
             stmt.setString(3, hashedPassword);
-            stmt.setString(4, role);
-            stmt.executeUpdate();
+            stmt.setString(4, user.getRole());
+
+            // Exécuter la requête
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Retourne true si l'utilisateur a été enregistré
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Erreur lors de l'enregistrement de l'utilisateur : " + e.getMessage());
+            //e.printStackTrace();
             return false;
         }
 
-        return true;
+
     }
 
     // Récuperer tous les utilsateurs
-    public List<User> getAllUser(){
+    public List<User> getAllUsers(){
+        String selectAllUsersSQL = "SELECT id, username, email, password, role FROM users";
         List<User> users = new ArrayList<>();
-        String query = "SELECT * FROM users";
 
-        try(Connection connection = DatabaseConnection.connect();
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query)){
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectAllUsersSQL);
+            ResultSet resultSet = preparedStatement.executeQuery()){
 
-            while (rs.next()){
+            while (resultSet.next()){
                 User user = new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("role")
+                        resultSet.getString("username"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("role")
                 );
-                users.add(user);
+                user.setId(resultSet.getInt("id"));// Assigner l'ID
+                users.add(user);// Ajouter l'utilisateur à la liste
             }
         }catch (SQLException e){
+            System.out.println("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
             e.printStackTrace();
         }
         return  users;
@@ -58,26 +63,34 @@ public class UserService {
 
     // Récupérer un utilisateur par ID (Read)
     public User getUserById(int id){
-        String query = "SELECT * FROM users WHERE id = ?";
+        String selectUserSQL = "SELECT id, username, email, password, role FROM users WHERE id = ?";
+        User user = null;
 
-        try(Connection connection = DatabaseConnection.connect();
-            PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(selectUserSQL)){
 
-            if (rs.next()){
-                return new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("role")
-                );
+            // Définir l'ID dans la requête
+            preparedStatement.setInt(1, id);
+
+            // Executer la requete
+
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                if (resultSet.next()){
+                    user = new User(
+                            resultSet.getString("username"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"),
+                            resultSet.getString("role")
+                    );
+                    user.setId(resultSet.getInt("id"));
+                }
             }
 
 
+
         }catch (SQLException e){
-            e.printStackTrace();
+            System.out.println("Erreur lors de la récupération de l'utilisateur : " + e.getMessage());
+            //e.printStackTrace();
         }
         return null; // Retourne null si l'utilisateur n'est pas trouve
     }
@@ -86,7 +99,7 @@ public class UserService {
     public boolean updateUser(int id, String username, String email, String password, String role){
         String query = "UPDATE users SET usermane = ?, email = ?,  role = ?";
 
-        try(Connection connection = DatabaseConnection.connect();
+        try(Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1, username);
             stmt.setString(2, email);
@@ -106,7 +119,7 @@ public class UserService {
     public boolean deleteUser(int id){
         String query = "DELETE FROM users WHERE id = ?";
 
-        try(Connection connection = DatabaseConnection.connect();
+        try(Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query)){
 
             stmt.setInt(1, id);
@@ -123,7 +136,7 @@ public class UserService {
     public  boolean authenticate(String identify, String password){
         String query = "SELECT password FROM users WHERE username = ? OR email = ?";
 
-        try (Connection connection = DatabaseConnection.connect();
+        try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)){
             stmt.setString(1, identify);
             stmt.setString(2, identify);

@@ -1,26 +1,23 @@
 package models;
 
 public class User {
-    private int id; // Unique identifier
-    private String username; // Username
-    private String email; // User email
-    private String password; // Password (hashed)
-    private String role; // Role (manager, employee)
+    private int id;
+    private String username;
+    private String email;
+    private String password;
+    private String role;
 
-    // Empty constructor
-    public User() {}
 
-    // Constructor with all fields
-    public User(int id, String username, String email, String password, String role) {
-        this.id = id;
+
+    // Constructeurs
+    public User(String username, String email, String password, String role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-
-    // Constructor with all fields
+    // Getters et setters
     public int getId() {
         return id;
     }
