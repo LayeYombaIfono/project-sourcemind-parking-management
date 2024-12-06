@@ -1,158 +1,170 @@
 package services;
 
+
 import database.DatabaseConnection;
 import models.User;
-import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.*;
+import utils.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserService {
-
-    // Ajouter un nouvel utilisateur (create)
-    public boolean registerUser(User user){
-        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()); //Hachage du mot de passe
-        String query = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+public class UserService implements UserServiceInterface {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    // Ajouter un utilisateur
+    @Override
+    public boolean registerUser(User user) {
+        String addUserSQL = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
+        logger.info("Tentative d'ajout d'un utilisateur : {}", user.getUsername());
 
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getEmail());
-            stmt.setString(3, hashedPassword);
-            stmt.setString(4, user.getRole());
+
+            PreparedStatement preparedStatement = connection.prepareStatement(addUserSQL)){
+
+            //Hasher le mot de passe
+            String hashedPassword = PasswordUtil.hashPassword(user.getPassword());
+
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, hashedPassword);
+            preparedStatement.setString(4, user.getRole());
 
             // Exécuter la requête
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Retourne true si l'utilisateur a été enregistré
+            int rowsAffected = preparedStatement.executeUpdate();
+            if ( rowsAffected > 0){
+                logger.info("Utilisateur ajouté avec succès : {}", user.getUsername());
+                return true;
+            }
+             // Retourne true si l'utilisateur a été enregistré
 
-        } catch (SQLException e) {
-            System.out.println("Erreur lors de l'enregistrement de l'utilisateur : " + e.getMessage());
-            //e.printStackTrace();
-            return false;
+        }catch (SQLException e){
+            logger.error("Erreur lors de l'ajout de l'utilisateur : {}", user.getUsername());
         }
-
-
+        return false;
     }
 
-    // Récuperer tous les utilsateurs
-    public List<User> getAllUsers(){
-        String selectAllUsersSQL = "SELECT id, username, email, password, role FROM users";
+
+    // Recuperer tous les utilisateurs
+    @Override
+    public List<User> getAllUsers(boolean includePasswords) {
+        String getAllUsersSQL = includePasswords
+                ? "SELECT id, username, email, password, role FROM users"
+                : "SELECT id, username, email, role FROM users";
+
+        logger.info("Récupération de tous les utilisateurs");
+
         List<User> users = new ArrayList<>();
-
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectAllUsersSQL);
-            ResultSet resultSet = preparedStatement.executeQuery()){
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(getAllUsersSQL)){
 
+            //Boucle pour parcourir la liste des utilisateurs
             while (resultSet.next()){
                 User user = new User(
                         resultSet.getString("username"),
                         resultSet.getString("email"),
-                        resultSet.getString("password"),
+                        includePasswords ? resultSet.getString("password"): null,
                         resultSet.getString("role")
                 );
-                user.setId(resultSet.getInt("id"));// Assigner l'ID
+                //user.setId(resultSet.getInt("id"));// Assigner l'ID
                 users.add(user);// Ajouter l'utilisateur à la liste
             }
+            logger.info("Tous les utilisateurs ont été récupérés avec succès.");
         }catch (SQLException e){
-            System.out.println("Erreur lors de la récupération des utilisateurs : " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Erreur lors de la récupération des utilisateurs : ", e);
         }
-        return  users;
+
+        return users;
     }
 
-    // Récupérer un utilisateur par ID (Read)
-    public User getUserById(int id){
-        String selectUserSQL = "SELECT id, username, email, password, role FROM users WHERE id = ?";
-        User user = null;
+    // Récupérer un utilisateur par son id
+    @Override
+    public User getUserById(int id) {
+        String getUserSQL = "SELECT id, username, email, role FROM users WHERE id = ?";
+        logger.info("Récupération d'un utilisateur");
 
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(selectUserSQL)){
+            PreparedStatement preparedStatement = connection.prepareStatement(getUserSQL)){
 
             // Définir l'ID dans la requête
             preparedStatement.setInt(1, id);
 
-            // Executer la requete
-
             try(ResultSet resultSet = preparedStatement.executeQuery()){
                 if (resultSet.next()){
-                    user = new User(
+                    User user = new User(
                             resultSet.getString("username"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"),
+                            null,
                             resultSet.getString("role")
                     );
+
                     user.setId(resultSet.getInt("id"));
+                    logger.info("L'utilisateur à été récupéré avec succès.");
+                    return  user;
                 }
+
             }
-
-
-
         }catch (SQLException e){
-            System.out.println("Erreur lors de la récupération de l'utilisateur : " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Erreur lors de la récupération de l'utilisateur : ", e);
         }
-       return user;
+        return null;
     }
 
-    // Mettre à jour un utilisateur (Update)
-    public boolean updateUser(int id, String username, String email, String password, String role){
-        String query = "UPDATE users SET usermane = ?, email = ?,  role = ?";
-
+    // Modifier les information de l'utilisateur
+    @Override
+    public boolean updateUser(User user) {
+        String updateUserSQL = "UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?";
+        logger.info("Modification de l'utilisateur ");
         try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1, username);
-            stmt.setString(2, email);
-            stmt.setString(3, role);
-            stmt.setInt(4, id);
+            PreparedStatement preparedStatement = connection.prepareStatement(updateUserSQL)){
 
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Retourne true si la mise à jour a réussie
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.setString(3, user.getRole());
+            preparedStatement.setInt(4, user.getId());
 
-        }catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-    }
+            // Exécuter la requête
+            int rowsAffected = preparedStatement.executeUpdate();
 
-    // Supprimer un utilisateur (Delete)
-    public boolean deleteUser(int id){
-        String query = "DELETE FROM users WHERE id = ?";
-
-        try(Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query)){
-
-            stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0; // Retourne true si la suppression a ressuie
-
-        }catch (SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Authentifier un utilisateur avec un email ou usename (vérification du mot de passe)
-    public  boolean authenticate(String identify, String password){
-        String query = "SELECT password FROM users WHERE username = ? OR email = ?";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)){
-            stmt.setString(1, identify);
-            stmt.setString(2, identify);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()){
-                String hashedPassword = rs.getString("password");
-                return BCrypt.checkpw(password, hashedPassword); //Verification du mot de passe
+            if (rowsAffected > 0){
+                logger.info("Utilisateur modifié avec succès : {}", user.getUsername());
             }
-
-        }catch (SQLException e){
-            e.printStackTrace();
             return true;
+
+
+        }catch (SQLException e){
+            logger.error("Erreur lors de modification de l'utilisateur : {}", user.getUsername());
+            return false;
         }
-        return false; //Retourne false si l'authentification échoué
     }
+
+
+    // Supprimer un utilisateur
+    @Override
+    public boolean deleteUserById(int id) {
+        String deleteUserSQL = "DELETE FROM users WHERE id = ?";
+        logger.info("Suppression de l'utilisateur");
+
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(deleteUserSQL)){
+
+            preparedStatement.setInt(1, id);
+
+            // Exécuter la requête
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0){
+                logger.info("Utilisateur supprimé avec succès :");
+            }
+            return true; // Retourne true si l'utilisateur a été modifier
+
+        }catch (SQLException e){
+            logger.error("Erreur lors de la suppression de l'utilisateur : ", e);
+            return false;
+        }
+
+    }
+
 
 }
 
