@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../css/output.css">
+    <title>Gestion des utilisateurs</title>
+    <link rel="stylesheet" href="../../css/global.css">
+</head>
+
+<body class="bg-gray-100">
+
+    <header class="container-fluid bg-cyan-900 text-white p-4">
+        <h1 class="text-center text-xl font-bold ">Interface Administrateur - Gestion des Utilisateurs</h1>
+    </header>
+
+
+    <div class="p-4">
+        <!-- Formulaire pour ajouter un utilisateur -->
+        <div class="bg-white p-4 rounded shadow mb-4">
+            <h2 class="text-lg font-bold mb-2">Ajouter un utilisateur</h2>
+            <form id="add-user-form" class="grid grid-cols-2 gap-4">
+                <input type="text" id="username" placeholder="Nom d'utilisateur" class="border rounded p-2" required>
+                <input type="email" id="email" placeholder="Email" class="border rounded p-2" required>
+                <input type="password" id="password" placeholder="Mot de passe" class="border rounded p-2" required>
+                <select id="role" class="border rounded p-2">
+                    <option value="manager">Gestionnaire</option>
+                    <option value="employee">Employé</option>
+                    <option value="admin">Administrateur</option>
+                </select>
+                <button type="submit"
+                    class="col-span-2  bg-cyan-600 text-white p-2 rounded w-52 hover:bg-cyan-900">Ajouter</button>
+            </form>
+        </div>
+
+        <!-- Tableau des utilisateurs -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="text-lg font-bold mb-2">Liste des Utilisateurs</h2>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr>
+                        <th class="border p-2">ID</th>
+                        <th class="border p-2">Nom d'utilisateur</th>
+                        <th class="border p-2">Email</th>
+                        <th class="border p-2">Rôle</th>
+                        <th class="border p-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    <!-- Les utilisateurs seront ajoutés dynamiquement ici -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

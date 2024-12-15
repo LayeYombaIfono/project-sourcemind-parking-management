@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jersey-server-3.1.9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/jersey-server-3.1.9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

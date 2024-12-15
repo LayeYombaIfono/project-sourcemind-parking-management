@@ -4,17 +4,17 @@ public class ParkingSpot {
     private int id; // Unique identifier
     private String spotNumber; // Seat number (unique)
     private boolean isReserved; // Place status (true = reserved, false = available)
-    private Integer currentVehicleId; // ID of the occupied vehicle (null if the space is free)
+    //private Integer currentVehicleId; // ID of the occupied vehicle (null if the space is free)
 
     public ParkingSpot() {
     }
 
     // Constructor with all fields
-    public ParkingSpot(int id, String spotNumber, boolean isReserved, Integer currentVehicleId) {
+    public ParkingSpot(int id, String spotNumber, boolean isReserved) {
         this.id = id;
         this.spotNumber = spotNumber;
         this.isReserved = isReserved;
-        this.currentVehicleId = currentVehicleId;
+
     }
 
     // Getters and setters
@@ -43,11 +43,15 @@ public class ParkingSpot {
         isReserved = reserved;
     }
 
-    public Integer getCurrentVehicleId() {
-        return currentVehicleId;
-    }
 
-    public void setCurrentVehicleId(Integer currentVehicleId) {
-        this.currentVehicleId = currentVehicleId;
+
+    @Override
+    public String toString() {
+        return "ParkingSpot{" +
+                "id=" + id +
+                ", spotNumber='" + spotNumber + '\'' +
+                ", isReserved=" + isReserved +
+
+                '}';
     }
 }

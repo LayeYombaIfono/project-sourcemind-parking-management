@@ -8,7 +8,7 @@ public class DatabaseConnection {
 
 
     public static Connection getConnection() throws SQLException{
-           String URL = "jdbc:mysql://localhost:3306/parking_management_sourcemind";
+           String URL = "jdbc:mysql://localhost:3306/parking_management";
            String USER = "root";
            String PASSWORD = "";
 

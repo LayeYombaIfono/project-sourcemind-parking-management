@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class ActivityLog {
     private int id; // Unique identifier
     private int vehicleId; // ID of the vehicle concerned
-    private int userId; // ID of the user who performed the action
+    private User user; // ID of the user who performed the action
     private String action; // Action type (entry, exit, reservation, release)
     private LocalDateTime timestamp; // Date and time of the action
 
@@ -15,10 +15,10 @@ public class ActivityLog {
     }
 
     //Constructor with all fields
-    public ActivityLog(int id, int vehicleId, int userId, String action, LocalDateTime timestamp) {
+    public ActivityLog(int id, int vehicleId, User user, String action, LocalDateTime timestamp) {
         this.id = id;
         this.vehicleId = vehicleId;
-        this.userId = userId;
+        this.user = user;
         this.action = action;
         this.timestamp = timestamp;
     }
@@ -40,13 +40,6 @@ public class ActivityLog {
         this.vehicleId = vehicleId;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
 
     public String getAction() {
         return action;
@@ -62,5 +55,26 @@ public class ActivityLog {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "ActivityLog{" +
+                "id=" + id +
+                ", vehicleId=" + vehicleId +
+                ", userId=" + user +
+                ", action='" + action + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

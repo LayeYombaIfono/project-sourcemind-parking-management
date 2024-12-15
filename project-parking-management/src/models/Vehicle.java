@@ -6,10 +6,10 @@ public class Vehicle {
     private String licencePlate; // License plate (unique)
     private String model; // Vehicle model
     private String fuelType; // Fuel type (petrol, diesel, electric, hybrid)
-    private int ownerId; // Owner ID (foreign key to `users`)
+    private User ownerId; // Owner ID (foreign key to `users`)
 
     // Constructor with all fields
-    public Vehicle(int id, String licencePlate, String model, String fuelType, int ownerId) {
+    public Vehicle(int id, String licencePlate, String model, String fuelType, User ownerId) {
         this.id = id;
         this.licencePlate = licencePlate;
         this.model = model;
@@ -50,11 +50,22 @@ public class Vehicle {
         this.fuelType = fuelType;
     }
 
-    public int getOwnerId() {
+    public User getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(int ownerId) {
+    public void setOwnerId(User ownerId) {
         this.ownerId = ownerId;
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "id=" + id +
+                ", licencePlate='" + licencePlate + '\'' +
+                ", model='" + model + '\'' +
+                ", fuelType='" + fuelType + '\'' +
+                ", ownerId=" + ownerId +
+                '}';
     }
 }

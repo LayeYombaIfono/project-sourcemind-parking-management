@@ -1,7 +1,12 @@
-// postcss.config.js
+
+
 module.exports = {
-    plugins: [
-        require('tailwindcss'),
-        require('autoprefixer')
-    ]
+    plugins: {
+        tailwindcss: {},
+        autoprefixer: {},
+        'postcss-nested': {},
+        'tailwindcss-custom-forms': {},
+        'tailwindcss-dark-mode': {},
+        'tailwindcss-transitions': {},
+    }
 }
